@@ -2,3 +2,6 @@
 *.dcu
 *.local
 *.identcache
+*.exe
+/examples/__history
+/__history

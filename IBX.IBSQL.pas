@@ -295,8 +295,6 @@ type
 
   { TIBBatch }
 
-//  [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or
-//    pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
   {$ifdef compilerversion < 12}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
   {$else}
@@ -320,8 +318,6 @@ type
     property Filename: String read FFilename write FFilename;
   end;
 
-//  [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or
-//    pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
   {$ifdef compilerversion < 12}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
   {$else}
@@ -3830,7 +3826,7 @@ procedure Register;
 begin
 
   // componentes
-  RegisterComponents('Interbase', [TIBSQL]);
+  RegisterComponents('Interbase', [TIBSQL,TIBBatch]);
 
 end;
 

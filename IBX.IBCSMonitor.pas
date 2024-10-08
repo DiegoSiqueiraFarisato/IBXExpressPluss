@@ -125,6 +125,7 @@ type
     property Enabled : Boolean read GetEnabled write SetEnabled;
   end;
 
+  procedure Register;
 implementation
 
 uses
@@ -731,4 +732,9 @@ begin
   FContext := AContext;
 end;
 
+procedure Register;
+begin
+  // componentes
+  RegisterComponents('Interbase', [TIBMonitorClient]);
+end;
 end.

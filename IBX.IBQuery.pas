@@ -19,8 +19,15 @@ unit IBX.IBQuery;
 
 interface
 
-uses System.Classes, Data.DB, IBX.IBHeader, IBX.IBDatabase, IBX.IBCustomDataSet,
-     IBX.IBSQL, System.Generics.Collections;
+uses
+  System.Classes,
+  Data.DB,
+  System.Generics.Collections,
+
+  IBX.IBHeader,
+  IBX.IBDatabase,
+  IBX.IBCustomDataSet,
+  IBX.IBSQL;
 
 type
 

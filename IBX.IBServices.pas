@@ -474,13 +474,11 @@ type
     property TableNames : String read FTableNames write FTableNames;
   end;
 
-
   {$ifdef compilerversion < 12}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
   {$else}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator32 or pidiOSDevice32 or pidiOSDevice64 or pidAndroidArm32)]
   {$endif}
-
   TIBBackupRestoreService = class(TIBControlAndQueryService)
   private
     FVerbose: Boolean;
@@ -760,6 +758,7 @@ type
     property ActiveUser : Boolean read FActiveUser write SetActiveUser default false;
   end;
 
+  procedure Register;
 
 implementation
 
@@ -3950,6 +3949,14 @@ begin
   SPBConstants.Add('res_archive_recover_until', isc_spb_res_archive_recover_until); {do not localize}
   SPBConstants.Add('res_archive_recover', isc_spb_res_archive_recover); {do not localize}
   SPBConstants.Add('dmp_create', isc_spb_dmp_create); {do not localize}
+end;
+
+procedure Register;
+begin
+
+  // componentes
+  RegisterComponents('Interbase', [TIBBackupService,TIBRestoreService]);
+
 end;
 
 initialization

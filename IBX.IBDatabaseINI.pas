@@ -77,7 +77,7 @@ type
 
   function SlashPath( sPath : string ) : string;
   function LocalServerPath( sFile : string = '') : string;
-
+  procedure Register;
 implementation
 
 uses
@@ -347,6 +347,12 @@ procedure TIBDatabaseINI.SetCharacterSet(const Value: String);
 begin
   if FCharacterSet <> Value then
     FCharacterSet := Value;
+end;
+
+procedure Register;
+begin
+  // componentes
+  RegisterComponents('Interbase', [TIBDatabaseINI]);
 end;
 
 end.
