@@ -167,7 +167,11 @@ implementation
 { TIBSubscription }
 
 uses
-  IBX.IBXConst, System.SysUtils, IBX.IB, IBX.IBSQL, IBX.IBUtils;
+  System.SysUtils,
+  IBX.IBXConst,
+  IBX.IB,
+  IBX.IBSQL,
+  IBX.IBUtils;
 
 procedure TIBSubscriptions.ActivateConnection;
 begin
@@ -175,7 +179,8 @@ begin
     IBError(ibxeDatabaseNotAssigned, [nil]);
   if not Assigned(Transaction) then
     IBError(ibxeTransactionNotAssigned, [nil]);
-  if not Database.Connected then Database.Open;
+  if not Database.Connected then
+    Database.Open;
 end;
 
 function TIBSubscriptions.Add(SubscriptionName: string): TIBSubscriptionItem;

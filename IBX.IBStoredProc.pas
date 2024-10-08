@@ -97,6 +97,8 @@ type
     property OnFilterRecord;
   end;
 
+  procedure Register;
+
 implementation
 
 uses
@@ -585,6 +587,14 @@ end;
 function TIBStoredProc.PSGetCommandType: TPSCommandType;
 begin
   Result := ctStoredProc;
+end;
+
+procedure Register;
+begin
+
+  // componentes
+  RegisterComponents('Interbase', [TIBStoredProc]);
+
 end;
 
 end.

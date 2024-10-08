@@ -145,7 +145,9 @@ type
 implementation
 
 uses
-  System.SysUtils, IBX.IBErrorCodes, IBX.IBHeader;
+  System.SysUtils,
+  IBX.IBErrorCodes,
+  IBX.IBHeader;
 
 { TIBDatabaseInfo }
 
@@ -179,13 +181,11 @@ begin
   inherited Destroy;
 end;
 
-
-function TIBDatabaseInfo.Call(ErrCode: ISC_STATUS;
-  RaiseError: Boolean): ISC_STATUS;
+function TIBDatabaseInfo.Call(ErrCode: ISC_STATUS;RaiseError: Boolean): ISC_STATUS;
 begin
   result := ErrCode;
-  {Handle when the Error is due to a Database disconnect.  Pass it on to
-   FDatabase so it can handle this}
+  {Handle when the Error is due to a Database disconnect.
+   Pass it on to FDatabase so it can handle this}
   if CheckStatusVector([isc_lost_db_connection]) then
     FDatabase.Call(ErrCode, RaiseError)
   else
