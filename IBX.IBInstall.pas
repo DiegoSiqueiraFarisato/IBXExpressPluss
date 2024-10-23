@@ -200,8 +200,7 @@ type
 implementation
 
 uses
-  IBX.IBXConst,
-  IBX.IBIntf;
+  IBX.IBXConst, IBX.IBIntf;
 
 const
   IBInstallerMessages : array[TIBInstallerError] of string = (
@@ -217,6 +216,8 @@ const
     SInvalidOnErrorResult,
     SInvalidOnStatusResult
     );
+
+
 
 procedure IBInstallerError(ECode: TIBInstallerError; const Args: array of const);
 begin

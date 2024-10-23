@@ -41,8 +41,7 @@ type
 
   TIBCustomService = class;
 
-  TIBLoginEvent = procedure(Database: TIBCustomService;
-    LoginParams: TStrings) of object;
+  TIBLoginEvent = procedure(Database: TIBCustomService; LoginParams: TStrings) of object;
 
   {$ifdef compilerversion < 12}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator or pidiOSDevice32 or pidiOSDevice64 or pidAndroid)]
@@ -479,6 +478,7 @@ type
   {$else}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator32 or pidiOSDevice32 or pidiOSDevice64 or pidAndroidArm32)]
   {$endif}
+
   TIBBackupRestoreService = class(TIBControlAndQueryService)
   private
     FVerbose: Boolean;
@@ -495,8 +495,14 @@ type
     property Verbose : Boolean read FVerbose write FVerbose default False;
   end;
 
-  TBackupOption = (IgnoreChecksums, IgnoreLimbo, MetadataOnly, NoGarbageCollection,
-    OldMetadataDesc, NonTransportable, ConvertExtTables);
+  TBackupOption = (
+    IgnoreChecksums,
+    IgnoreLimbo,
+    MetadataOnly,
+    NoGarbageCollection,
+    OldMetadataDesc,
+    NonTransportable,
+    ConvertExtTables);
   TBackupOptions = set of TBackupOption;
 
   {$ifdef compilerversion < 12}
@@ -758,7 +764,7 @@ type
     property ActiveUser : Boolean read FActiveUser write SetActiveUser default false;
   end;
 
-  procedure Register;
+procedure Register;
 
 implementation
 
@@ -3955,7 +3961,12 @@ procedure Register;
 begin
 
   // componentes
-  RegisterComponents('Interbase', [TIBBackupService,TIBRestoreService]);
+  RegisterComponents('Interbase', [
+    TIBBackupService,
+    TIBRestoreService,
+    TIBValidationService,
+    TIBSecurityService,
+    TIBStatisticalService]);
 
 end;
 

@@ -79,6 +79,8 @@ type
     property OnError:TErrorEvent read FOnError write FOnError;
   end;
 
+  procedure Register;
+
 implementation
 
 uses
@@ -578,6 +580,16 @@ begin
         else
           Parent.OnError(Parent, 0);
   end;
+end;
+
+procedure Register;
+begin
+
+  // componentes
+  RegisterComponents('Interbase', [
+    TIBEvents
+  ]);
+
 end;
 
 end.

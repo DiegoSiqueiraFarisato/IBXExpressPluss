@@ -106,6 +106,7 @@ type
     { Public declarations }
   end;
 
+type
   [ComponentPlatformsAttribute(pidWin32 or pidWin64)]
   TIBFilterDialog = class(TComponent)
   private
@@ -156,12 +157,7 @@ type
 implementation
 
 uses
-  System.TypInfo,
-  { IBX }
-  IBX.IBQuery,
-  IBX.IBFilterSummary,
-  IBX.IBUtils,
-  IBX.IBVisualConst;
+  IBX.IBQuery, System.TypInfo, IBX.IBFilterSummary, IBX.IBUtils, IBX.IBVisualConst;
 
 {$R *.DFM}
 

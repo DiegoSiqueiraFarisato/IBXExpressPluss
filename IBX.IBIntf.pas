@@ -283,13 +283,8 @@ var
 
 implementation
 
-uses
-  System.SysUtils,
-  System.Generics.Defaults,
-
-  IBX.IB,
-  IBX.IBXMLHeader,
-  IBX.IBXConst
+uses System.SysUtils, IBX.IB, IBX.IBXMLHeader, IBX.IBXConst,
+     System.Generics.Defaults
 {$IFDEF ANDROID}
   , Posix.Stdlib,
   Androidapi.IOUtils

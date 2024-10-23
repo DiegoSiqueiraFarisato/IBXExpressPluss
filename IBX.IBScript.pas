@@ -139,6 +139,7 @@ type
     property StartingMem : int64 read FStartingMem;
   end;
 
+
   TIBScript = class(TComponent)
   private
     FSQLParser: TIBSQLParser;

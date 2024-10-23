@@ -12,10 +12,12 @@ object frmIBFilterDialog: TfrmIBFilterDialog
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
+  OldCreateOrder = False
   Position = poScreenCenter
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 0
@@ -51,6 +53,10 @@ object frmIBFilterDialog: TfrmIBFilterDialog
     object tabSelected: TTabSheet
       Caption = '&Selected'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lstSelectedFields: TListBox
         Left = 0
         Top = 0
@@ -144,6 +150,10 @@ object frmIBFilterDialog: TfrmIBFilterDialog
     object tabByRange: TTabSheet
       Caption = 'By &Range'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 181
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 8
         Top = 12
