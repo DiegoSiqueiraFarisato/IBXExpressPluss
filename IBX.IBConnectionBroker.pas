@@ -379,7 +379,7 @@ procedure Register;
 begin
 
   // componentes
-  RegisterComponents('Interbase', [TIBConnectionBroker]);
+  RegisterComponents('Interbase', [TIBConnectionBroker,TIBPooledConnection]);
 
 end;
 

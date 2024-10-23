@@ -735,6 +735,6 @@ end;
 procedure Register;
 begin
   // componentes
-  RegisterComponents('Interbase', [TIBMonitorClient]);
+  RegisterComponents('Interbase', [TIBMonitorClient,TIBMonitorServer]);
 end;
 end.
