@@ -20,7 +20,8 @@ unit IBX.IBUpdateSQL;
 interface
 
 uses
-  System.Classes, Data.DB, IBX.IB, IBX.IBCustomDataSet, IBX.IBQuery;
+  System.Classes, System.SysUtils, System.Variants,
+  Data.DB, IBX.IB, IBX.IBCustomDataSet, IBX.IBQuery;
 
 type
 { TIBUpdateSQL }
@@ -30,88 +31,107 @@ type
   {$else}
   [ComponentPlatformsAttribute(pidWin32 or pidWin64 or pidOSX32 or pidiOSSimulator32 or pidiOSDevice32 or pidiOSDevice64 or pidAndroidArm32)]
   {$endif}
-
   TIBUpdateSQL = class(TIBDataSetUpdateObject)
   private
     FDataSet: TIBCustomDataSet;
     FQueries: array[TUpdateKind] of TIBQuery;
     FSQLText: array[TUpdateKind] of TStrings;
+
     function GetQuery(UpdateKind: TUpdateKind): TIBQuery;
-    function GetSQLIndex(Index: Integer): TStrings;
+    function GetSQL(UpdateKind: TUpdateKind): TStrings;
     procedure SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
-    procedure SetSQLIndex(Index: Integer; Value: TStrings);
+    procedure SQLChanged(Sender: TObject);
+    procedure InitializeQuery(UpdateKind: TUpdateKind);
   protected
-    function GetSQL(UpdateKind: TUpdateKind): TStrings; override;
     function GetDataSet: TIBCustomDataSet; override;
     procedure SetDataSet(ADataSet: TIBCustomDataSet); override;
-    procedure SQLChanged(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
     procedure Apply(UpdateKind: TUpdateKind); override;
     procedure ExecSQL(UpdateKind: TUpdateKind);
     procedure SetParams(UpdateKind: TUpdateKind);
-    property DataSet;
+
     property Query[UpdateKind: TUpdateKind]: TIBQuery read GetQuery;
     property SQL[UpdateKind: TUpdateKind]: TStrings read GetSQL write SetSQL;
   published
-    property ModifySQL: TStrings index 0 read GetSQLIndex write SetSQLIndex;
-    property InsertSQL: TStrings index 1 read GetSQLIndex write SetSQLIndex;
-    property DeleteSQL: TStrings index 2 read GetSQLIndex write SetSQLIndex;
+    property DataSet;
+    property ModifySQL: TStrings index Ord(ukModify) read GetSQL write SetSQL;
+    property InsertSQL: TStrings index Ord(ukInsert) read GetSQL write SetSQL;
+    property DeleteSQL: TStrings index Ord(ukDelete) read GetSQL write SetSQL;
   end;
 
-  procedure Register;
-implementation
+procedure Register;
 
-uses
-  System.SysUtils, System.Variants;
+implementation
 
 { TIBUpdateSQL }
 
 constructor TIBUpdateSQL.Create(AOwner: TComponent);
 var
-  UpdateKind: TUpdateKind;
+  Kind: TUpdateKind;
 begin
   inherited Create(AOwner);
-  for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
+  for Kind := Low(TUpdateKind) to High(TUpdateKind) do
   begin
-    FSQLText[UpdateKind] := TStringList.Create;
-    TStringList(FSQLText[UpdateKind]).OnChange := SQLChanged;
+    FSQLText[Kind] := TStringList.Create;
+    TStringList(FSQLText[Kind]).OnChange := SQLChanged;
   end;
 end;
 
 destructor TIBUpdateSQL.Destroy;
 var
-  UpdateKind: TUpdateKind;
+  Kind: TUpdateKind;
 begin
   if Assigned(FDataSet) and (FDataSet.UpdateObject = Self) then
     FDataSet.UpdateObject := nil;
-  for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
-    FSQLText[UpdateKind].Free;
-  inherited Destroy;
-end;
 
-procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind);
-begin
-  Query[UpdateKind].Prepare;
-  Query[UpdateKind].ExecSQL;
-  if Query[UpdateKind].RowsAffected <> 1 then
-    IBError(ibxeUpdateFailed, [nil]);
+  for Kind := Low(TUpdateKind) to High(TUpdateKind) do
+  begin
+    FreeAndNil(FQueries[Kind]);
+    FreeAndNil(FSQLText[Kind]);
+  end;
+
+  inherited Destroy;
 end;
 
 function TIBUpdateSQL.GetQuery(UpdateKind: TUpdateKind): TIBQuery;
 begin
   if not Assigned(FQueries[UpdateKind]) then
-  begin
-    FQueries[UpdateKind] := TIBQuery.Create(Self);
-    FQueries[UpdateKind].SQL.Assign(FSQLText[UpdateKind]);
-    if (FDataSet is TIBCustomDataSet) then
-    begin
-      FQueries[UpdateKind].Database := TIBCustomDataSet(FDataSet).DataBase;
-      FQueries[UpdateKind].Transaction := TIBCustomDataSet(FDataSet).Transaction;
-    end;
-  end;
+    InitializeQuery(UpdateKind);
   Result := FQueries[UpdateKind];
+end;
+
+procedure TIBUpdateSQL.InitializeQuery(UpdateKind: TUpdateKind);
+var
+  Q: TIBQuery;
+begin
+  Q := TIBQuery.Create(Self);
+  Q.SQL.Assign(FSQLText[UpdateKind]);
+
+  if Assigned(FDataSet) then
+  begin
+    Q.Database := FDataSet.Database;
+    Q.Transaction := FDataSet.Transaction;
+  end;
+
+  FQueries[UpdateKind] := Q;
+end;
+
+procedure TIBUpdateSQL.ExecSQL(UpdateKind: TUpdateKind);
+var
+  Q: TIBQuery;
+begin
+  Q := Query[UpdateKind];
+  if not Assigned(Q) then
+    Exit;
+
+  Q.Prepare;
+  Q.ExecSQL;
+
+  if Q.RowsAffected <> 1 then
+    IBError(ibxeUpdateFailed, [nil]);
 end;
 
 function TIBUpdateSQL.GetSQL(UpdateKind: TUpdateKind): TStrings;
@@ -119,9 +139,27 @@ begin
   Result := FSQLText[UpdateKind];
 end;
 
-function TIBUpdateSQL.GetSQLIndex(Index: Integer): TStrings;
+procedure TIBUpdateSQL.SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
 begin
-  Result := FSQLText[TUpdateKind(Index)];
+  FSQLText[UpdateKind].Assign(Value);
+end;
+
+procedure TIBUpdateSQL.SQLChanged(Sender: TObject);
+var
+  Kind: TUpdateKind;
+begin
+  for Kind := Low(TUpdateKind) to High(TUpdateKind) do
+  begin
+    if Sender = FSQLText[Kind] then
+    begin
+      if Assigned(FQueries[Kind]) then
+      begin
+        FQueries[Kind].Params.Clear;
+        FQueries[Kind].SQL.Assign(FSQLText[Kind]);
+      end;
+      Break;
+    end;
+  end;
 end;
 
 function TIBUpdateSQL.GetDataSet: TIBCustomDataSet;
@@ -134,54 +172,31 @@ begin
   FDataSet := ADataSet;
 end;
 
-procedure TIBUpdateSQL.SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
-begin
-  FSQLText[UpdateKind].Assign(Value);
-end;
-
-procedure TIBUpdateSQL.SetSQLIndex(Index: Integer; Value: TStrings);
-begin
-  SetSQL(TUpdateKind(Index), Value);
-end;
-
-procedure TIBUpdateSQL.SQLChanged(Sender: TObject);
-var
-  UpdateKind: TUpdateKind;
-begin
-  for UpdateKind := Low(TUpdateKind) to High(TUpdateKind) do
-    if Sender = FSQLText[UpdateKind] then
-    begin
-      if Assigned(FQueries[UpdateKind]) then
-      begin
-        FQueries[UpdateKind].Params.Clear;
-        FQueries[UpdateKind].SQL.Assign(FSQLText[UpdateKind]);
-      end;
-      Break;
-    end;
-end;
-
 procedure TIBUpdateSQL.SetParams(UpdateKind: TUpdateKind);
 var
   I: Integer;
-  Old: Boolean;
   Param: TParam;
-  PName: string;
   Field: TField;
   Value: Variant;
+  FieldName: string;
+  IsOld: Boolean;
 begin
   if not Assigned(FDataSet) then
     Exit;
+
   for I := 0 to Query[UpdateKind].Params.Count - 1 do
   begin
     Param := Query[UpdateKind].Params[I];
-    PName := Param.Name;
-    Old := PName.ToUpper.StartsWith('OLD_'); {do not localize}
-    if Old then
-      PName := PName.Remove(0, 4);
-    Field := FDataSet.FindField(PName);
+    FieldName := Param.Name;
+    IsOld := FieldName.ToUpper.StartsWith('OLD_');
+    if IsOld then
+      Delete(FieldName, 1, 4);
+
+    Field := FDataSet.FindField(FieldName);
     if not Assigned(Field) then
       Continue;
-    if Old then
+
+    if IsOld then
       Param.AssignFieldValue(Field, Field.OldValue)
     else
     begin
@@ -201,11 +216,7 @@ end;
 
 procedure Register;
 begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBUpdateSQL]);
-
+  RegisterComponents('InterBase', [TIBUpdateSQL]);
 end;
-
 
 end.
