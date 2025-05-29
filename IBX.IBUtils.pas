@@ -21,49 +21,42 @@ interface
 
 uses
   {$IFDEF MSWINDOWS} Winapi.Messages,{$ENDIF}
-  System.Classes, Data.DB;
-
+  System.Classes, System.SysUtils, Data.DB, IBX.IBXConst, IBX.IB, Data.DBCommon;
 
 type
   TIBProtocols = (ibTCP, ibNamedPipe, ibSPX, ibLocal);
 
 function RandomString(iLength: Integer): String;
 function RandomInteger(iLow, iHigh: Integer): Integer;
-function StripString(st: String; CharsToStrip: String): String;
-function FormatIdentifier(Dialect: Integer; Value: String): String;
-function FormatIdentifierValue(Dialect: Integer; Value: String): String;
-function ExtractIdentifier(Dialect: Integer; Value: String): String;
-function QuoteIdentifier(Dialect: Integer; Value: String): String;
-function AddIBParamSQLForDetail(Params: TParams; SQL: String; Native: Boolean; Dialect : Integer): string;
-procedure DecomposeDatabaseName(DatabaseName : String;
-            var ServerName, Protocol, DatabasePath : String); overload; deprecated; {use either the SSL version or the TIBProtocols version}
-procedure DecomposeDatabaseName(DatabaseName : String;
-            var ServerName, Port : string;
-            var Protocol : TIBProtocols;
-            var DatabasePath : String); overload;
-procedure DecomposeDatabaseName(DatabaseName : String;
-            var ServerName, Port : String;
-            var Protocol : TIBProtocols;
-            var DatabasePath : String;
-            var SSL : Boolean;
-            var ServerPublicFile, ServerPublicPath, ClientCertFile,
-                ClientPassPhraseFile, ClientPassPhrase : String); overload;
-function ComposeDatabaseName(ServerName, Port : String;
-            Protocol : TIBProtocols;
-            DatabasePath : String;
-            SSL : Boolean = false;
-            ServerPublicFile : String = '';  ServerPublicPath : String = '';
-            ClientCertFile : String = ''; ClientPassPhraseFile  : String = '';
-            ClientPassPhrase : String = '') : string;
+function StripString(const st, CharsToStrip: String): String;
+function FormatIdentifier(Dialect: Integer; const Value: String): String;
+function FormatIdentifierValue(Dialect: Integer; const Value: String): String;
+function ExtractIdentifier(Dialect: Integer; const Value: String): String;
+function QuoteIdentifier(Dialect: Integer; const Value: String): String;
+function AddIBParamSQLForDetail(Params: TParams; const SQL: String; Native: Boolean; Dialect: Integer): string;
+procedure DecomposeDatabaseName(const DatabaseName: String;
+  var ServerName, Protocol, DatabasePath: String); overload; deprecated;
+procedure DecomposeDatabaseName(const DatabaseName: String;
+  var ServerName, Port: string; var Protocol: TIBProtocols;
+  var DatabasePath: String); overload;
+procedure DecomposeDatabaseName(const DatabaseName: String;
+  var ServerName, Port: String; var Protocol: TIBProtocols;
+  var DatabasePath: String; var SSL: Boolean;
+  var ServerPublicFile, ServerPublicPath, ClientCertFile,
+  ClientPassPhraseFile, ClientPassPhrase: String); overload;
+function ComposeDatabaseName(const ServerName, Port: String;
+  Protocol: TIBProtocols; const DatabasePath: String; SSL: Boolean = False;
+  const ServerPublicFile: String = ''; const ServerPublicPath: String = '';
+  const ClientCertFile: String = ''; const ClientPassPhraseFile: String = '';
+  const ClientPassPhrase: String = ''): string;
 
 type
-
   TIBTimer = class(TComponent)
   private
     FInterval: Cardinal;
     {$IFDEF MSWINDOWS}
     FWindowHandle: THandle;
-    {$ENDIF MSWINDOWS}
+    {$ENDIF}
     FOnTimer: TNotifyEvent;
     FEnabled: Boolean;
     procedure UpdateTimer;
@@ -85,99 +78,82 @@ type
   end;
 
 var
-  CopyMasterFieldToDetail : Boolean;
+  CopyMasterFieldToDetail: Boolean;
 
-  procedure Register;
+procedure Register;
 
 implementation
-
-uses {$ifdef MSWINDOWS} Winapi.Windows, {$endif} System.SysUtils, IBX.IBXConst,
-     IBX.IB, Data.DBCommon;
 
 function RandomString(iLength: Integer): String;
 begin
   Result := '';
-  while Result.Length < iLength do
-    Result := result + IntToStr(RandomInteger(0, High(Integer)));
-  if Result.Length > iLength then
-    Result := Result.Substring(0, iLength);
+  while Length(Result) < iLength do
+    Result := Result + IntToStr(RandomInteger(0, High(Integer)));
+  SetLength(Result, iLength);
 end;
 
 function RandomInteger(iLow, iHigh: Integer): Integer;
 begin
-  result := Random(iHigh - iLow) + iLow;
+  Result := Random(iHigh - iLow) + iLow;
 end;
 
-function StripString(st: String; CharsToStrip: String): String;
+function StripString(const st, CharsToStrip: String): String;
 var
-  c : Char;
+  c: Char;
 begin
-  result := '';
+  Result := '';
   for c in st do
-  begin
     if not CharsToStrip.Contains(c) then
-      result := result + c;
-  end;
+      Result := Result + c;
 end;
 
-function FormatIdentifier(Dialect: Integer; Value: String): String;
+function FormatIdentifier(Dialect: Integer; const Value: String): String;
 begin
-  Value := Trim(Value);
+  Result := Trim(Value);
   if Dialect = 1 then
-    Value := AnsiUpperCase(Value)
+    Result := AnsiUpperCase(Result)
+  else if (Result <> '') and (Result[Low(Result)] = '"') then
+    Result := '"' + StringReplace(TrimRight(Result), '"', '""', [rfReplaceAll]) + '"'
   else
-    if (Value <> '') and (Value[Low(Value)] = '"') then
-      Value := '"' + StringReplace (TrimRight(Value), '"', '""', [rfReplaceAll]) + '"'
-    else
-      Value := AnsiUpperCase(Value);
-  Result := Value;
+    Result := AnsiUpperCase(Result);
 end;
 
-function FormatIdentifierValue(Dialect: Integer; Value: String): String;
+function FormatIdentifierValue(Dialect: Integer; const Value: String): String;
 begin
-  Value := Value.Trim;
+  Result := Value.Trim;
   if Dialect = 1 then
-    Value := Value.ToUpper
-  else
+    Result := Result.ToUpper
+  else if (Result <> '') and (Result[Low(Result)] = '"') then
   begin
-    if (Value <> '') and (Value[Low(Value)] = '"') then
-    begin
-      Value := Value.Remove(0, 1);
-      Value := Value.Remove(Value.Length - 1);
-      Value := StringReplace (Value, '""', '"', [rfReplaceAll]);
-    end
-    else
-      Value := Value.ToUpper;
-  end;
-  Result := Value;
+    Result := Result.Remove(0, 1);
+    Result := Result.Remove(Result.Length - 1);
+    Result := StringReplace(Result, '""', '"', [rfReplaceAll]);
+  end
+  else
+    Result := Result.ToUpper;
 end;
 
-function ExtractIdentifier(Dialect: Integer; Value: String): String;
+function ExtractIdentifier(Dialect: Integer; const Value: String): String;
 begin
-  Value := Value.Trim;
+  Result := Value.Trim;
   if Dialect = 1 then
-    Value := Value.ToUpper
-  else
+    Result := Result.ToUpper
+  else if (Result <> '') and (Result[Low(Result)] = '"') then
   begin
-    if (Value <> '') and (Value[Low(Value)] = '"') then
-    begin
-      Value := Value.Remove(0, 1);
-      Value := Value.Remove(Value.Length - 1, 1);
-      Value := StringReplace (Value, '""', '"', [rfReplaceAll]);
-    end
-    else
-      Value := Value.ToUpper;
-  end;
-  Result := Value;
+    Result := Result.Remove(0, 1);
+    Result := Result.Remove(Result.Length - 1, 1);
+    Result := StringReplace(Result, '""', '"', [rfReplaceAll]);
+  end
+  else
+    Result := Result.ToUpper;
 end;
 
-function QuoteIdentifier(Dialect: Integer; Value: String): String;
+function QuoteIdentifier(Dialect: Integer; const Value: String): String;
 begin
   if Dialect = 1 then
-    Value := Value.Trim.ToUpper
+    Result := Value.Trim.ToUpper
   else
-    Value := '"' + StringReplace (Value, '"', '""', [rfReplaceAll]) + '"';
-  Result := Value;
+    Result := '"' + StringReplace(Value, '"', '""', [rfReplaceAll]) + '"';
 end;
 
 function AddIBParamSQLForDetail(Params: TParams; SQL: String; Native: Boolean; Dialect : Integer): string;
