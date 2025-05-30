@@ -16,11 +16,12 @@ interface
 uses 
   System.Classes, 
   System.Generics.Collections,
-  Data.DB, 
-  IBX.IB, 
-  IBX.IBDatabase, 
+  System.SysUtils,
+  Data.DB,
+  IBX.IB,
+  IBX.IBDatabase,
   IBX.IBCustomDataSet,
-  IBX.IBHeader;
+  IBX.IBHeader, IBX.IBSQL;
 
 type
   // Exception classes for better error handling
@@ -89,8 +90,8 @@ type
     procedure ValidateConnection;
     
     // Statement management
-    procedure InternalPrepare;
-    procedure InternalUnprepare;
+    procedure InternalPrepare;reintroduce;
+    procedure InternalUnprepare;reintroduce;
     procedure FreeStatement;
     
     // Parameter handling
@@ -112,6 +113,8 @@ type
     // Serialization support
     procedure ReadParamData(Reader: TReader);
     procedure WriteParamData(Writer: TWriter);
+    procedure AssignParamValue(SQLParam: TIBXSQLVAR; Param: TParam);
+    procedure MapParametersFromDataSource;
     
   protected
     // IProviderSupport interface
@@ -170,10 +173,8 @@ procedure Register;
 implementation
 
 uses
-  System.SysUtils, 
   System.TypInfo,
-  IBX.IBUtils, 
-  IBX.IBSQL;
+  IBX.IBUtils;
 
 const
   // SQL constants for metadata queries

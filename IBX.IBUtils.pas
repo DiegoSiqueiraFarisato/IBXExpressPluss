@@ -21,7 +21,8 @@ interface
 
 uses
   {$IFDEF MSWINDOWS} Winapi.Messages,{$ENDIF}
-  System.Classes, System.SysUtils, Data.DB, IBX.IBXConst, IBX.IB, Data.DBCommon;
+  System.Classes, System.SysUtils, Data.DB, IBX.IBXConst, IBX.IB, Data.DBCommon,
+  Winapi.Windows;
 
 type
   TIBProtocols = (ibTCP, ibNamedPipe, ibSPX, ibLocal);
@@ -33,19 +34,12 @@ function FormatIdentifier(Dialect: Integer; const Value: String): String;
 function FormatIdentifierValue(Dialect: Integer; const Value: String): String;
 function ExtractIdentifier(Dialect: Integer; const Value: String): String;
 function QuoteIdentifier(Dialect: Integer; const Value: String): String;
-function AddIBParamSQLForDetail(Params: TParams; const SQL: String; Native: Boolean; Dialect: Integer): string;
-procedure DecomposeDatabaseName(const DatabaseName: String;
-  var ServerName, Protocol, DatabasePath: String); overload; deprecated;
-procedure DecomposeDatabaseName(const DatabaseName: String;
-  var ServerName, Port: string; var Protocol: TIBProtocols;
-  var DatabasePath: String); overload;
-procedure DecomposeDatabaseName(const DatabaseName: String;
-  var ServerName, Port: String; var Protocol: TIBProtocols;
-  var DatabasePath: String; var SSL: Boolean;
-  var ServerPublicFile, ServerPublicPath, ClientCertFile,
-  ClientPassPhraseFile, ClientPassPhrase: String); overload;
-function ComposeDatabaseName(const ServerName, Port: String;
-  Protocol: TIBProtocols; const DatabasePath: String; SSL: Boolean = False;
+function AddIBParamSQLForDetail(Params: TParams; SQL: String; Native: Boolean; Dialect : Integer): string;
+procedure DecomposeDatabaseName(DatabaseName: String; var ServerName, Protocol, DatabasePath: String); overload; deprecated;
+procedure DecomposeDatabaseName(DatabaseName: String; var ServerName, Port: string; var Protocol: TIBProtocols; var DatabasePath: String); overload;
+procedure DecomposeDatabaseName(DatabaseName: String; var ServerName, Port: String; var Protocol: TIBProtocols; var DatabasePath: String; var SSL: Boolean;
+  var ServerPublicFile, ServerPublicPath, ClientCertFile,   ClientPassPhraseFile, ClientPassPhrase: String); overload;
+function ComposeDatabaseName(const ServerName, Port: String; Protocol: TIBProtocols; const DatabasePath: String; SSL: Boolean = False;
   const ServerPublicFile: String = ''; const ServerPublicPath: String = '';
   const ClientCertFile: String = ''; const ClientPassPhraseFile: String = '';
   const ClientPassPhrase: String = ''): string;
@@ -98,11 +92,9 @@ begin
 end;
 
 function StripString(const st, CharsToStrip: String): String;
-var
-  c: Char;
 begin
   Result := '';
-  for c in st do
+  for var c in st do
     if not CharsToStrip.Contains(c) then
       Result := Result + c;
 end;
@@ -205,14 +197,13 @@ begin
     Result := AddWhereClause;
 end;
 
-procedure DecomposeDatabaseName(DatabaseName : String;
-  var ServerName, Protocol, DatabasePath : String);
+procedure DecomposeDatabaseName(DatabaseName : String; var ServerName, Protocol, DatabasePath : String);
 var
-  p : TIBProtocols;
-  port : string;
+  lProtocols : TIBProtocols;
+  lPort : string;
 begin
-  DecomposeDatabaseName(DatabaseName, ServerName, Port, p, DatabasePath);
-  case p of
+  DecomposeDatabaseName(DatabaseName, ServerName, lPort, lProtocols, DatabasePath);
+  case lProtocols of
     ibTCP: Protocol := 'TCP';
     ibNamedPipe: Protocol := 'NamedPipe';
     ibSPX: Protocol := 'SPX';
@@ -220,13 +211,10 @@ begin
   end;
 end;
 
-function ComposeDatabaseName(ServerName, Port : String;
-            Protocol : TIBProtocols;
-            DatabasePath : String;
-            SSL : Boolean = false;
-            ServerPublicFile : String = '';  ServerPublicPath : String = '';
-            ClientCertFile : String = ''; ClientPassPhraseFile  : String = '';
-            ClientPassPhrase : String = '') : string;
+function ComposeDatabaseName(const ServerName, Port: String; Protocol: TIBProtocols; const DatabasePath: String; SSL: Boolean = False;
+  const ServerPublicFile: String = ''; const ServerPublicPath: String = '';
+  const ClientCertFile: String = ''; const ClientPassPhraseFile: String = '';
+  const ClientPassPhrase: String = ''): string;
 const
   SPF = '?serverPublicFile='; {do nit localize}
   SPP = '?serverPublicPath=';  {do not localize}

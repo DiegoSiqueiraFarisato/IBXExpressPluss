@@ -38,7 +38,7 @@ type
     FSQLText: array[TUpdateKind] of TStrings;
 
     function GetQuery(UpdateKind: TUpdateKind): TIBQuery;
-    function GetSQL(UpdateKind: TUpdateKind): TStrings;
+    function GetSQL(UpdateKind: TUpdateKind): TStrings; reintroduce;
     procedure SetSQL(UpdateKind: TUpdateKind; Value: TStrings);
     procedure SQLChanged(Sender: TObject);
     procedure InitializeQuery(UpdateKind: TUpdateKind);
