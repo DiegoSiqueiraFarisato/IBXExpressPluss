@@ -80,8 +80,6 @@ type
     property OnLog : TIBConnectionBrokerLogEvent read FOnLog write FOnLog;
   end;
 
-  procedure Register;
-
 implementation
 
 uses
@@ -373,14 +371,6 @@ begin
   for i := 0 to FMaxConns - 1 do
     if FConnPool[i].ConnStatus = 0 then
       Inc(Result);
-end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBConnectionBroker,TIBPooledConnection]);
-
 end;
 
 end.

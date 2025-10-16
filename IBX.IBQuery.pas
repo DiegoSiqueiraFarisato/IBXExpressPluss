@@ -115,8 +115,6 @@ type
     property OnFilterRecord;
 end;
 
-  procedure Register;
-
 implementation
 
 uses IBX.IB, System.SysUtils;
@@ -541,12 +539,5 @@ begin
   end;
 end;
 
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBQuery]);
-
-end;
 
 end.

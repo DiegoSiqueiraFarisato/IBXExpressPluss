@@ -392,8 +392,6 @@ var
   TPBConstantNames : TDPBConstantNames;
   CodePages : TDictionary<String, Integer>;
 
-  procedure Register;
-
 implementation
 
 uses
@@ -3124,15 +3122,6 @@ begin
   CodePages.Add('KSC_5601', 949);    {do not localize}
 
 end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBDataBase,TIBTransaction]);
-
-end;
-
 
 initialization
   BuildDPBConstants;

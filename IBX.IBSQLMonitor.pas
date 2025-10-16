@@ -108,7 +108,6 @@ function SetMonitorHook(NewHook : IIBSQLMonitorHook) : IIBSQLMonitorHook;
 procedure EnableMonitoring;
 procedure DisableMonitoring;
 function MonitoringEnabled: Boolean;
-procedure Register;
 
 implementation
 
@@ -1161,14 +1160,6 @@ begin
 {$ENDIF}
     FreeAndNil(FWriterThread);
   end;
-end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBSQLMonitor]);
-
 end;
 
 initialization

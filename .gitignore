@@ -5,3 +5,4 @@
 *.exe
 /examples/__history
 /__history
+/package/__history

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E570C3CC-C264-4E74-8AC4-9E079081C5D3}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="IBXinterbaseRTL.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="IBXInterBaseVCL.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="IBXinterbaseRTL">
+        <MSBuild Projects="IBXinterbaseRTL.dproj"/>
+    </Target>
+    <Target Name="IBXinterbaseRTL:Clean">
+        <MSBuild Projects="IBXinterbaseRTL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IBXinterbaseRTL:Make">
+        <MSBuild Projects="IBXinterbaseRTL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="IBXInterBaseVCL">
+        <MSBuild Projects="IBXInterBaseVCL.dproj"/>
+    </Target>
+    <Target Name="IBXInterBaseVCL:Clean">
+        <MSBuild Projects="IBXInterBaseVCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IBXInterBaseVCL:Make">
+        <MSBuild Projects="IBXInterBaseVCL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="IBXinterbaseRTL;IBXInterBaseVCL"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="IBXinterbaseRTL:Clean;IBXInterBaseVCL:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="IBXinterbaseRTL:Make;IBXInterBaseVCL:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

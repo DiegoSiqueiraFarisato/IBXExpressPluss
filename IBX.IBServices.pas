@@ -764,8 +764,6 @@ type
     property ActiveUser : Boolean read FActiveUser write SetActiveUser default false;
   end;
 
-procedure Register;
-
 implementation
 
 uses
@@ -3957,18 +3955,6 @@ begin
   SPBConstants.Add('dmp_create', isc_spb_dmp_create); {do not localize}
 end;
 
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [
-    TIBBackupService,
-    TIBRestoreService,
-    TIBValidationService,
-    TIBSecurityService,
-    TIBStatisticalService]);
-
-end;
 
 initialization
 

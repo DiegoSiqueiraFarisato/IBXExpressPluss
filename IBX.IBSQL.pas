@@ -573,8 +573,6 @@ type
 
   procedure OutputXML(sqlObject : TIBSQL; OutputObject: TIBOutputXML);
 
-procedure Register;
-
 implementation
 
 uses Data.DB, Data.DBConsts, System.Types, IBX.IBBlob, IBX.IBSQLMonitor,
@@ -3819,15 +3817,6 @@ procedure TIBBatch.ReadyFile;
 begin
   if FFile <> nil then
     FFile.Free;
-end;
-
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBSQL,TIBBatch]);
-
 end;
 
 end.

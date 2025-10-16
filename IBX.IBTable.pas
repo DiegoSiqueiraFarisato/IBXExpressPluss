@@ -176,11 +176,14 @@ type
     property OnFilterRecord;
   end;
 
-  procedure Register;
-
 implementation
 
-uses System.Variants, IBX.IBSQL, IBX.IBHeader, IBX.IBUtils, IBX.IBErrorCodes;
+uses
+  System.Variants,
+  IBX.IBSQL,
+  IBX.IBHeader,
+  IBX.IBUtils,
+  IBX.IBErrorCodes;
 
 { TIBTable }
 
@@ -1778,12 +1781,5 @@ begin
   Result := ctTable;
 end;
 
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBTable]);
-
-end;
 
 end.

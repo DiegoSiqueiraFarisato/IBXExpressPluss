@@ -62,8 +62,6 @@ type
     property DeleteSQL: TStrings index Ord(ukDelete) read GetSQL write SetSQL;
   end;
 
-procedure Register;
-
 implementation
 
 { TIBUpdateSQL }
@@ -212,11 +210,6 @@ procedure TIBUpdateSQL.Apply(UpdateKind: TUpdateKind);
 begin
   SetParams(UpdateKind);
   ExecSQL(UpdateKind);
-end;
-
-procedure Register;
-begin
-  RegisterComponents('InterBase', [TIBUpdateSQL]);
 end;
 
 end.

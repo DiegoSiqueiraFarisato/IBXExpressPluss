@@ -168,8 +168,6 @@ type
     property OnFilterRecord;
   end;
 
-procedure Register;
-
 implementation
 
 uses
@@ -895,7 +893,6 @@ end;
 // Component registration
 procedure Register;
 begin
-  RegisterComponents('Interbase', [TIBStoredProc]);
 end;
 
 end.

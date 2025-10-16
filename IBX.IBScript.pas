@@ -222,8 +222,6 @@ type
       FOnParamCheck;
   end;
 
-  procedure Register;
-
 implementation
 
 uses System.SysUtils, IBX.IBUtils, IBX.IB, IBX.IBXConst, IBX.IBIntf,
@@ -1580,14 +1578,6 @@ begin
     FDeltaMem := FInfoStats.CurrentMemory - FStartingMem + FDeltaMem;
   end;
   FStarted := False;
-end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBSQLParser, TIBScript]);
-
 end;
 
 end.

@@ -85,8 +85,6 @@ type
     property BatchCount : Integer read FBatchCount write SetBatchCount;
   end;
 
-  procedure Register;
-
 implementation
 
 uses IBX.IBHeader, IBX.IBIntf;
@@ -255,14 +253,6 @@ begin
   Result := FIndex < FErrors.Count - 1;
   if Result then
     Inc(FIndex);
-end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBBatchUpdate]);
-
 end;
 
 end.

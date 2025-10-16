@@ -228,8 +228,6 @@ const
 var
   ColumnTypes : TDictionary<SmallInt, string>;
 
-procedure Register;
-
 implementation
 
 uses 
@@ -3743,15 +3741,6 @@ begin
   ColumnTypes.Add(blr_timestamp, 'TIMESTAMP');		  {do not localize}
   ColumnTypes.Add(blr_int64, 'INT64');       {do not localize}
   ColumnTypes.Add(blr_boolean_dtype, 'BOOLEAN');  {do not localize}
-end;
-
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBExtraction]);
-
 end;
 
 initialization

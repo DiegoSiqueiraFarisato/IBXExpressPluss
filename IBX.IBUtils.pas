@@ -74,8 +74,6 @@ type
 var
   CopyMasterFieldToDetail: Boolean;
 
-procedure Register;
-
 implementation
 
 function RandomString(iLength: Integer): String;
@@ -483,14 +481,6 @@ end;
 procedure TIBTimer.Timer;
 begin
   if Assigned(FOnTimer) then FOnTimer(Self);
-end;
-
-procedure Register;
-begin
-
-  // componentes
-  RegisterComponents('Interbase', [TIBTimer]);
-
 end;
 
 initialization
